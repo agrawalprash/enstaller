@@ -4,6 +4,7 @@ import unittest
 
 from enstaller.enpkg import Enpkg
 from enstaller.store.indexed import IndexedStore
+from enstaller.utils import comparable_version
 
 from enstaller.main import _create_enstaller_update_enpkg
 
@@ -53,6 +54,19 @@ class DummyStore(IndexedStore):
 
     def get_data(self, key):
         pass
+
+class TestMixedVersion(unittest.TestCase):
+    def test_simple(self):
+        prefixes = [sys.prefix]
+        packages = [PackageMetadata("pywin32", "214", "1"),
+                    PackageMetadata("pywin32", "218.4.0", "1")]
+        remote_repo = DummyStore(packages)
+
+        enpkg = Enpkg(remote_repo, prefixes=prefixes)
+        enpkg._connect()
+        # This used to fail when we did not special case '\d+' to be equivalent
+        # to '\d+.0'
+        enpkg.install_actions("pywin32")
 
 class TestEnstallerHack(unittest.TestCase):
     def test_scenario1(self):

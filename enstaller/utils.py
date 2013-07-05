@@ -38,6 +38,11 @@ def comparable_version(version):
         # This hack makes it possible to use 'rc' in the version, where
         # 'rc' must be followed by a single digit.
         ver = version.replace('rc', '.dev99999')
+        # Another hack so that e.g. '214' is equivalent to
+        # '214.0'.
+        if not "." in ver:
+            ver += ".0"
+
         return NormalizedVersion(ver)
     except IrrationalVersionError:
         # If obtaining the RationalVersion object fails (for example for
